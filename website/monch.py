@@ -1,6 +1,8 @@
 import datetime
 from datetime import datetime
+from datetime import date
 from cs50 import SQL
+import calendar
 
 db = SQL("sqlite:///monch.db")
 # This will allow us to reference the information in the sql database.
@@ -56,4 +58,11 @@ def get_current_value():
     value = ((hour-5)%24)*60 + minute
     return value
 
+def get_current_day():
+    my_date = date.today()
+    return calendar.day_name[my_date.weekday()]
+
+test = datetime.today().strftime('%A').lower()
 print(f"{get_current_value()}")
+print(f"{get_current_day}")
+print(f"{test}")
