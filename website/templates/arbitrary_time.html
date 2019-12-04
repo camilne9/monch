@@ -1,15 +1,15 @@
 {% extends "homepage.html" %}
 
 {% block title %}
-    Dining Hall Ranks
+    Enter Time
 {% endblock %}
 
 {% block main %}
     <h1>Input the time you are interested in:</h1>
         <h2>
-            <form action="/dhallranks" method="post">
+            <form action="/inputtime" method="post">
                 <div class="form-group">
-                    Time: <select name="hour">
+                    Time: <select name="Hour">
                         <option disabled selected value="">Hour</option>
                         {% for hour in valid_hours%}
                         <option value = "{{hour}}">
@@ -19,22 +19,22 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    : <select name="minute">
+                    : <select name="Minute">
                         <option disabled selected value="">Minute</option>
-                        {% for hour in valid_hours%}
-                        <option value = "{{hour}}">
-                            {{hour}}
+                        {% for minute in valid_minutes%}
+                        <option value = "{{minute}}">
+                            {{minute}}
                         </option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                        <select name="AM/PM">
+                        <select name="Meridia">
                         <option disabled selected value="">AM/PM</option>
-                        <option value = "{{AM/PM}}">
+                        <option value = "AM">
                             AM
                         </option>
-                        <option value = "{{AM/PM}}">
+                        <option value = "PM">
                             PM
                         </option>
                     </select>

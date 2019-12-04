@@ -100,19 +100,23 @@ def buy():
         return render_template("buy.html")
 
 
-@app.route("/history")
+@app.route("/inputtime", methods=["GET", "POST"])
 @login_required
-def history():
-    """Show history of transactions"""
-    userid = session["user_id"]
-    # Retrieve stock history for the user.
-    rows = db.execute(f"SELECT * FROM history WHERE user_id = :userid", userid=userid)
-    user = db.execute(f"SELECT * FROM users WHERE id = :user_id", user_id=session["user_id"])
-    for row in rows:
-        row["StockValue"] = usd(row["StockValue"])
-        row["TotalValue"] = usd(row["TotalValue"])
-        row["cashremaining"] = usd(row["cashremaining"])
-    return render_template("history.html", rows=rows, cashremaining=usd(user[0]["cash"]))
+def inputtime():
+    valid_hours = list(range(1, 13))
+    valid_minutes = list(range(0, 60))
+    if request.method == "POST":
+        hour = int(request.form.get("Hour"))
+        minute = int(request.form.get("Minute"))
+        #if request.form.get("Hour") == None or request.form.get("Minute") == None or request.form.get("AM/PM") == None:
+        #    return apology("Not a valid time")
+        if request.form.get("Meridia") == "AM":
+            value = 60*hour + minute
+        else:
+            value = 60 * (hour + 12) + minute
+        return render_template("open.html", value=value)
+    else:
+        return render_template("arbitrary_time.html", valid_hours = valid_hours, valid_minutes = valid_minutes)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -190,8 +194,9 @@ def createaccount():
                 passwordhash = generate_password_hash(password)
                 db.execute(f"INSERT INTO users (username,hash,house) VALUES(:username, :passwordhash, :house)",
                        username=name, passwordhash=passwordhash, house=house)
-                db.execute(f"INSERT INTO dhallpreferences (user_id,pref1,pref2,pref3,pref4,pref5,pref6,pref7,pref8,pref9,pref10,pref11,pref12,pref13) VALUES(:userid,:pref1,:pref2,:pref3,:pref4,:pref5,:pref6,:pref7,:pref8,:pref9,:pref10,:pref11,:pref12,:pref13)"
-                           userid=session["user_id"],pref1="First-Year",pref2="Lowell",pref3="Quincy",pref4="Leverett",pref5="Dunster",pref6="Eliot",pref7="Currier",pref8="Adams",pref9="Winthrop",pref10="Mather",pref11="Pforzheimer",pref12="Kirkland",pref13="Cabot")
+                user = db.execute(f"SELECT * FROM users WHERE username=:name", name=name)
+                db.execute(f"INSERT INTO dhallpreferences (user_id,pref1,pref2,pref3,pref4,pref5,pref6,pref7,pref8,pref9,pref10,pref11,pref12,pref13) VALUES(:userid,:pref1,:pref2,:pref3,:pref4,:pref5,:pref6,:pref7,:pref8,:pref9,:pref10,:pref11,:pref12,:pref13)",
+                           userid=user[0]["id"],pref1="First-Year",pref2="Lowell",pref3="Quincy",pref4="Leverett",pref5="Dunster",pref6="Eliot",pref7="Currier",pref8="Adams",pref9="Winthrop",pref10="Mather",pref11="Pforzheimer",pref12="Kirkland",pref13="Cabot")
             return redirect("/")
         else:
             return apology("must select house")
@@ -208,7 +213,7 @@ def dhallranks():
         # Catch empty entries.
         preferences = [request.form.get(f"pref{i+1}") for i in range(13)]
         for row in preferences:
-            db.execute(f"UPDATE dhallpreferences SET(pref{i} = :preference) WHERE user_id=:userid", preference=)
+            db.execute(f"UPDATE dhallpreferences SET(pref{i} = :preference) WHERE user_id=:userid", preference=preferences[i])
     else:
         return render_template("dhallranks.html", houses=houses, house=user[0]["house"])
 
