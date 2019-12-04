@@ -61,3 +61,10 @@ def lookup(symbol):
 def usd(value):
     """Format value as USD."""
     return f"${value:,.2f}"
+
+def checkIfDuplicates(listOfElems):
+    ''' Check if given list contains any duplicates '''
+    if len(listOfElems) == len(set(listOfElems)):
+        return False
+    else:
+        return True

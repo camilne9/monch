@@ -7,7 +7,7 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, lookup, usd
+from helpers import apology, login_required, lookup, usd, checkIfDuplicates
 
 # Configure application
 app = Flask(__name__)
@@ -210,10 +210,17 @@ def dhallranks():
     """Sell shares of stock"""
     user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
     if request.method == "POST":
-        # Catch empty entries.
         preferences = [request.form.get(f"pref{i+1}") for i in range(13)]
-        for row in preferences:
-            db.execute(f"UPDATE dhallpreferences SET(pref{i} = :preference) WHERE user_id=:userid", preference=preferences[i])
+        for i in range(13):
+        # Catch empty entries.
+            for preference in preferences:
+                if not preference:
+                    return apology("Empty rank")
+        # Check for duplicates.
+        if checkIfDuplicates(preferences):
+            return apology("Cannot repeat Dining Halls")
+        for i in len(preferences):
+            db.execute(f"UPDATE dhallpreferences SET(pref{i} = :preference) WHERE user_id=:userid", preference=preferences[i], userid=user["id"])
     else:
         return render_template("dhallranks.html", houses=houses, house=user[0]["house"])
 
