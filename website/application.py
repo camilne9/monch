@@ -48,7 +48,10 @@ def index():
     """ Homepage """
     # If currently no user, show login page.
     # Show stocks and cashremaining for user.
-    return render_template("test.html")
+    if session.get("user_id") is None:
+        return render_template("test.html")
+    else:
+        return render_template("test.html", userid=session["user_id"])
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -191,34 +194,6 @@ def createaccount():
             return apology("must select house")
     else:
         return render_template("createaccount.html",houses=houses)
-
-
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    """Register user"""
-    if request.method == "POST":
-        name = request.form.get("username")
-        password = request.form.get("password")
-        # Catch empty entries.
-        if not request.form.get("username"):
-            return apology("must provide username", 403)
-        if not request.form.get("password"):
-            return apology("must provide password", 403)
-        users = db.execute(f"SELECT * FROM users WHERE username = :name", name=name)
-        # Catch repeat usernames.
-        if len(users) != 0:
-            return apology("username already in use. Choose another.", 403)
-        # Make sure confirmed passwords match
-        if request.form.get("password") != request.form.get("confirmpassword"):
-            return apology("passwords must match", 403)
-        else:
-            # Hash password and insert user into table.
-            passwordhash = generate_password_hash(password)
-            db.execute(f"INSERT INTO users (username,hash) VALUES(:username, :passwordhash)",
-                       username=name, passwordhash=passwordhash)
-            return redirect("/")
-    else:
-        return render_template("register.html")
 
 
 @app.route("/sell", methods=["GET", "POST"])
