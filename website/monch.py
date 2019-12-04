@@ -41,3 +41,9 @@ user_id = session["user_id"]
 user = db.execute(f"SELECT * FROM users WHERE user_id IS {user_id}")
 user_house = user["house"]
 houses = db.execute(f"SELECT house_in_question FROM restrictions WHERE restriction_id IN (SELECT restriction_id FROM new_generic_day WHERE {value} > start_time AND {value} < end_time ) AND open_to IS {user_house}")
+
+def order_by_preference(list_of_strings):
+    user_id = session["user_id"]
+    for house in list_of_strings:
+        houses = db.execute(f"SELECT * FROM preferences WHERE user_id IS {user_id} ORDER BY rank")
+    houses = houses["house"]
