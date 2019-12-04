@@ -9,6 +9,16 @@
         <h2>
             <form action="/inputtime" method="post">
                 <div class="form-group">
+                    Day: <select name="Day">
+                        <option disabled selected value="">Day of Week</option>
+                        {% for day in valid_days%}
+                        <option value = "{{day}}">
+                            {{day}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
                     Time: <select name="Hour">
                         <option disabled selected value="">Hour</option>
                         {% for hour in valid_hours%}

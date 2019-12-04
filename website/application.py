@@ -80,51 +80,6 @@ def index():
         return render_template("test.html", username=user[0]["username"], house=user[0]["house"].capitalize(), houses=output, time = currenttime)
 
 
-@app.route("/buy", methods=["GET", "POST"])
-@login_required
-def buy():
-    """Buy shares of stock"""
-    if request.method == "POST":
-        # Catch empty requests.
-        if not request.form.get("numofstocks"):
-            return apology("Must enter number of stocks", 403)
-        elif not request.form.get("corpcode"):
-            return apology("Must enter stock symbol", 403)
-        stock = request.form.get("corpcode")
-        numofstocks = request.form.get("numofstocks")
-        # Catch non-positive stock numbers.
-        if int(numofstocks) <= 0:
-            return apology("Must buy positive number of stocks")
-        stockvalue = lookup(stock)
-        # Catch invalid stock symbols.
-        if len(stockvalue) == 0:
-            return apology("Invalid symbol", 403)
-        user = db.execute(f"SELECT * FROM users WHERE id = :userid", userid=session["user_id"])
-        cashremaining = user[0]["cash"] - (float(numofstocks) * stockvalue["price"])
-        # Catch if enough money is available for transaction.
-        if cashremaining < 0:
-            return apology("Not enough cash for transaction", 403)
-        db.execute(f"UPDATE users SET cash = :cashremaining WHERE id = :userid", cashremaining=cashremaining, userid=user[0]["id"])
-        stocks = db.execute(f"SELECT * FROM stocks WHERE Stock = :stock AND user_id=:userid", stock=stock, userid=user[0]["id"])
-        # Make new table entry if no stocks from company owned, update otherwise.
-        if len(stocks) == 0:
-            db.execute(f"INSERT INTO stocks (user_id, Stock, NumOfStocks, StockValue, TotalValue) VALUES(:userid, :stock, :numofstocks, :stockvalue, :totalvalue)",
-                       userid=user[0]["id"], stock=stock, numofstocks=numofstocks, stockvalue=stockvalue["price"], totalvalue=(float(numofstocks)*stockvalue["price"]))
-        else:
-            db.execute(f"UPDATE stocks SET NumOfStocks = :number WHERE Stock = :stock AND user_id=:userid",
-                       number=int(numofstocks)+int(stocks[0]["NumOfStocks"]), stock=stock, userid=user[0]["id"])
-            db.execute(f"UPDATE stocks SET TotalValue = :value WHERE Stock = :stock AND user_id=:userid", value=(
-                (float(numofstocks)+stocks[0]["NumOfStocks"])*stockvalue["price"]), stock=stock, userid=user[0]["id"])
-            db.execute(f"UPDATE stocks SET StockValue = :stockvalue WHERE Stock = :stock",
-                       stockvalue=stockvalue["price"], stock=stock)
-        # Add to history table.
-        db.execute(f"INSERT INTO history (user_id, boughtsold, Stock, NumOfStocks, StockValue, TotalValue, cashremaining) VALUES(:userid, 'bought', :stock, :numofstocks, :stockvalue, :totalvalue, :cashremaining)",
-                   userid=user[0]["id"], stock=stock, numofstocks=int(numofstocks), stockvalue=stockvalue["price"], totalvalue=(float(numofstocks))*stockvalue["price"], cashremaining=cashremaining)
-        return redirect("/")
-    else:
-        return render_template("buy.html")
-
-
 @app.route("/inputtime", methods=["GET", "POST"])
 @login_required
 def inputtime():
@@ -133,10 +88,17 @@ def inputtime():
     valid_days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
     user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
     if request.method == "POST":
+        if request.form.get("Hour") == None:
+            return apology("Not a valid time")
+        if request.form.get("Minute") == None:
+            return apology("Not a valid time")
+        if request.form.get("Meridia") == None:
+            return apology("Not a valid time")
+        if request.form.get("Day") == None:
+            return apology("Not a valid day")
         hour = int(request.form.get("Hour"))
         minute = int(request.form.get("Minute"))
-        #if request.form.get("Hour") == None or request.form.get("Minute") == None or request.form.get("AM/PM") == None:
-        #    return apology("Not a valid time")
+
         if request.form.get("Meridia") == "AM":
             value = (60*(hour % 12)) + minute
         else:
@@ -154,7 +116,7 @@ def inputtime():
                     output.append(row["house_in_question"].capitalize())
         return render_template("open.html", houses=order_by_preference(output), house=user[0]["house"].capitalize())
     else:
-        return render_template("arbitrary_time.html", valid_hours = valid_hours, valid_minutes = valid_minutes, house=user[0]["house"].capitalize())
+        return render_template("arbitrary_time.html", valid_days=valid_days, valid_hours = valid_hours, valid_minutes = valid_minutes, house=user[0]["house"].capitalize())
 
 
 @app.route("/login", methods=["GET", "POST"])
