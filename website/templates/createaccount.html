@@ -1,0 +1,28 @@
+{% extends "homepage.html" %}
+
+{% block title %}
+    Create Account
+{% endblock %}
+
+{% block main %}
+    <form action="/createaccount" method="post">
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text">
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="password" placeholder="Password" type="password">
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="confirmpassword" placeholder="Confirm Password" type="password">
+        </div>
+        <div class="form-group">
+            <select name="house">
+                <option disabled selected value="">House</option>
+                {% for house in houses %}
+                    <option value = "{{house}}">{{house}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button class="btn btn-primary" type="submit">Create Account</button>
+    </form>
+{% endblock %}
