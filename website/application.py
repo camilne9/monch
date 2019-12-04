@@ -111,10 +111,18 @@ def inputtime():
         #if request.form.get("Hour") == None or request.form.get("Minute") == None or request.form.get("AM/PM") == None:
         #    return apology("Not a valid time")
         if request.form.get("Meridia") == "AM":
-            value = 60*hour + minute
+            value = (60*(hour % 12)) + minute
         else:
-            value = 60 * (hour + 12) + minute
-        return render_template("open.html", value=value)
+            value = 60 * ((hour % 12) + 12) + minute
+        user_id = session["user_id"]
+        user = db.execute(f"SELECT * FROM users WHERE id IS {user_id}")
+        user_house = user[0]["house"]
+        houses = db.execute(f"SELECT DISTINCT * FROM restrictions WHERE restriction_id IN (SELECT restriction_id FROM new_generic_day WHERE {value} > start_time AND {value} < end_time )")
+        output = []
+        for row in houses:
+            if row["open_to"]==user_house:
+                output.append(row["house_in_question"])
+        return render_template("open.html", houses=output)
     else:
         return render_template("arbitrary_time.html", valid_hours = valid_hours, valid_minutes = valid_minutes)
 
@@ -172,7 +180,7 @@ def createaccount():
     if request.method == "POST":
         # if we are potsing, we get the output of the lookup function and store it.
         house = request.form.get("house")
-        print(f"{house}")
+        house = house.lower()
         if house:
             # if the lookup doesn't return none, we use the lookup output to generate values that will allow us to update the necessary data.
             name = request.form.get("username")

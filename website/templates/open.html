@@ -5,10 +5,15 @@
 {% endblock %}
 
 {% block main %}
-    this is just a test:
-    <\br>
+    <h1>
+    Here are the houses open to you!
+    </h1>
+        <h2>
+            {% for house in houses %}
+            {{house}}<br></br>
+            {% endfor %}
+        </h2>
 
-    {{value}}
 
 
 {% endblock %}
