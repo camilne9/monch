@@ -7,7 +7,7 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, lookup, usd, checkIfDuplicates, order_by_preference, get_current_value
+from helpers import apology, login_required, lookup, usd, checkIfDuplicates, order_by_preference, get_current_value, current_time
 
 # Configure application
 app = Flask(__name__)
@@ -49,6 +49,7 @@ def index():
     # If currently no user, show login page.
     # Show stocks and cashremaining for user.
     time = get_current_value()
+    currenttime = current_time()
     print(f"{time}")
     houses = db.execute(f"SELECT house FROM new_generic_day WHERE {time} >= start_time AND {time} <= end_time")
     if session.get("user_id") is None:
@@ -60,7 +61,7 @@ def index():
                 output.append(row["house"].capitalize())
         if len(output) == 0:
             output.append("None")
-        return render_template("test.html", houses = output)
+        return render_template("test.html", houses = output, time = currenttime)
     else:
         user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
         houses = db.execute(f"SELECT DISTINCT * FROM restrictions WHERE restriction_id IN (SELECT restriction_id FROM new_generic_day WHERE {time} > start_time AND {time} < end_time)")
@@ -71,10 +72,12 @@ def index():
                     output.append("Annenberg")
                 else:
                     output.append(row["house_in_question"].capitalize())
-        output = order_by_preference(output)
+        output2 = order_by_preference(output)
+        print(f"{output}")
+        print(f"{output2}")
         if len(output) == 0:
             output.append("None")
-        return render_template("test.html", username=user[0]["username"], house=user[0]["house"].capitalize(), houses=output)
+        return render_template("test.html", username=user[0]["username"], house=user[0]["house"].capitalize(), houses=output, time = currenttime)
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -127,6 +130,7 @@ def buy():
 def inputtime():
     valid_hours = list(range(1, 13))
     valid_minutes = list(range(0, 60))
+    valid_days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]
     user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
     if request.method == "POST":
         hour = int(request.form.get("Hour"))

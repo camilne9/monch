@@ -76,11 +76,15 @@ def order_by_preference(list_of_strings):
     user_id = session["user_id"]
     if len(list_of_strings) == 0:
         return list_of_strings
-    for house in list_of_strings:
-        houses = db.execute(f"SELECT house FROM dhallpreferences WHERE user_id IS {user_id} ORDER BY rank")
-    names = []
+    houses = db.execute(f"SELECT house FROM dhallpreferences WHERE user_id IS {user_id} ORDER BY rank")
+    houses2 = []
     for house in houses:
-        names.append(house["house"])
+        houses2.append(house["house"])
+    print(f"{houses2}")
+    names = []
+    for house in houses2:
+        if house in list_of_strings:
+            names.append(house)
     if len(names) == 0:
         return list_of_strings
     return names
@@ -91,3 +95,13 @@ def get_current_value():
     minute = now.minute
     value = ((hour-5)%24)*60 + minute
     return value
+
+def current_time():
+    now = datetime.now()
+    minute = now.minute
+    hour = now.hour - 5
+    if hour > 12:
+        hour = hour - 12
+    if minute < 10:
+        return str(f"{hour}:0{minute}")
+    return str(f"{hour}:{minute}")
