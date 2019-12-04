@@ -1,0 +1,47 @@
+{% extends "homepage.html" %}
+
+{% block title %}
+    Dining Hall Ranks
+{% endblock %}
+
+{% block main %}
+    <h1>Input the time you are interested in:</h1>
+        <h2>
+            <form action="/dhallranks" method="post">
+                <div class="form-group">
+                    Time: <select name="hour">
+                        <option disabled selected value="">Hour</option>
+                        {% for hour in valid_hours%}
+                        <option value = "{{hour}}">
+                            {{hour}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    : <select name="minute">
+                        <option disabled selected value="">Minute</option>
+                        {% for hour in valid_hours%}
+                        <option value = "{{hour}}">
+                            {{hour}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                        <select name="AM/PM">
+                        <option disabled selected value="">AM/PM</option>
+                        <option value = "{{AM/PM}}">
+                            AM
+                        </option>
+                        <option value = "{{AM/PM}}">
+                            PM
+                        </option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </form>
+        </h2>
+
+
+{% endblock %}
