@@ -28,6 +28,16 @@ def dhallranks():
             value = 60*hour + minute
         else:
             value = 60 * (hour + 12) + minute
+        houses = db.execute(f"SELECT house FROM new_generic_day ")
         return render_template("open.html", value=value)
     else:
         return render_template("arbitrary_time.html", valid_hours = valid_hours, valid_minutes = valid_minutes)
+
+@app.route("/open_dhalls")
+@login_required
+def open_dhalls():
+
+user_id = session["user_id"]
+user = db.execute(f"SELECT * FROM users WHERE user_id IS {user_id}")
+user_house = user["house"]
+houses = db.execute(f"SELECT house_in_question FROM restrictions WHERE restriction_id IN (SELECT restriction_id FROM new_generic_day WHERE {value} > start_time AND {value} < end_time ) AND open_to IS {user_house}")
