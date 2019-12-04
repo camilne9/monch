@@ -83,7 +83,9 @@ def order_by_preference(list_of_strings):
     print(f"{houses2}")
     names = []
     for house in houses2:
-        if house in list_of_strings:
+        if house == "Annenberg":
+            names.append("Annenberg")
+        elif house in list_of_strings:
             names.append(house)
     if len(names) == 0:
         return list_of_strings
@@ -93,7 +95,7 @@ def get_current_value():
     now = datetime.now()
     hour = now.hour
     minute = now.minute
-    value = ((hour-5)%24)*60 + minute
+    value = ((hour-3)%24)*60 + minute
     return value
 
 def current_time():
