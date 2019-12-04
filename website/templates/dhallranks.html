@@ -1,0 +1,146 @@
+{% extends "homepage.html" %}
+
+{% block title %}
+    Dining Hall Ranks
+{% endblock %}
+
+{% block main %}
+    <h1> Rank your favorite Harvard Dining Halls below:</h1>
+        <h2>
+            <form action="/dhallranks" method="post">
+                <div class="form-group">
+                    1: <select name="house">
+                        <option disabled selected value="">House</option>
+                        {% for house in houses %}
+                        <option value = "{{house}}">
+                            {{house}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    2: <select name="house">
+                        <option disabled selected value="">House</option>
+                        {% for house in houses %}
+                        <option value = "{{house}}">
+                            {{house}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    3: <select name="house">
+                        <option disabled selected value="">House</option>
+                        {% for house in houses %}
+                        <option value = "{{house}}">
+                            {{house}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    4: <select name="house">
+                        <option disabled selected value="">House</option>
+                        {% for house in houses %}
+                        <option value = "{{house}}">
+                            {{house}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    5: <select name="house">
+                        <option disabled selected value="">House</option>
+                        {% for house in houses %}
+                        <option value = "{{house}}">
+                            {{house}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    6: <select name="house">
+                        <option disabled selected value="">House</option>
+                        {% for house in houses %}
+                        <option value = "{{house}}">
+                            {{house}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    7: <select name="house">
+                        <option disabled selected value="">House</option>
+                        {% for house in houses %}
+                        <option value = "{{house}}">
+                            {{house}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    8: <select name="house">
+                        <option disabled selected value="">House</option>
+                        {% for house in houses %}
+                        <option value = "{{house}}">
+                            {{house}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    9: <select name="house">
+                        <option disabled selected value="">House</option>
+                        {% for house in houses %}
+                        <option value = "{{house}}">
+                            {{house}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    10: <select name="house">
+                        <option disabled selected value="">House</option>
+                        {% for house in houses %}
+                        <option value = "{{house}}">
+                            {{house}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    11: <select name="house">
+                        <option disabled selected value="">House</option>
+                        {% for house in houses %}
+                        <option value = "{{house}}">
+                            {{house}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    12: <select name="house">
+                        <option disabled selected value="">House</option>
+                        {% for house in houses %}
+                        <option value = "{{house}}">
+                            {{house}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    13: <select name="house">
+                        <option disabled selected value="">House</option>
+                        {% for house in houses %}
+                        <option value = "{{house}}">
+                            {{house}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </form>
+        </h2>
+
+
+{% endblock %}

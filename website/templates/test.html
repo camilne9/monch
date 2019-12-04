@@ -5,5 +5,10 @@
 {% endblock %}
 
 {% block main %}
-<h1> {{ userid }} </h1>
+    {% if session.user_id %}
+        <h1> Welcome {{ username }}!</h1>
+    {% else %}
+        <h1> Welcome to Mönch!</h1>
+    {% endif %}
+
 {% endblock %}

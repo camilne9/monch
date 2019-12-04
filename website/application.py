@@ -51,7 +51,8 @@ def index():
     if session.get("user_id") is None:
         return render_template("test.html")
     else:
-        return render_template("test.html", userid=session["user_id"])
+        user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
+        return render_template("test.html", username=user[0]["username"], house=user[0]["house"])
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -196,9 +197,9 @@ def createaccount():
         return render_template("createaccount.html",houses=houses)
 
 
-@app.route("/sell", methods=["GET", "POST"])
+@app.route("/dhallranks", methods=["GET", "POST"])
 @login_required
-def sell():
+def dhallranks():
     """Sell shares of stock"""
     if request.method == "POST":
         # Catch empty entries.
@@ -243,7 +244,7 @@ def sell():
                    userid=user[0]["id"], stock=stock, numofstocks=int(numofstocks), stockvalue=stockvalue["price"], totalvalue=(float(numofstocks)*stockvalue["price"]), cashremaining=cashremaining)
         return redirect("/")
     else:
-        return render_template("sell.html")
+        return render_template("dhallranks.html", houses=houses)
 
 
 @app.route("/passwordchange", methods=["GET", "POST"])
