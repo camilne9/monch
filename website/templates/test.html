@@ -7,8 +7,21 @@
 {% block main %}
     {% if session.user_id %}
         <h1> Welcome {{ username }}!</h1>
+            <h2>
+                The Following Dining Halls are currently open for you:<br>
+                {% for house in houses %}
+                {{house}}<br>
+                {% endfor %}
+            </h2>
     {% else %}
         <h1> Welcome to Mönch!</h1>
+        <h2>
+            The Following Dining Halls are currently open:<br>
+            {% for house in houses %}
+            {{house}}<br>
+            {% endfor %}
+            Log in to see your restrictions.
+        </h2>
     {% endif %}
 
 {% endblock %}

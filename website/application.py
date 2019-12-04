@@ -7,7 +7,7 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, lookup, usd, checkIfDuplicates, order_by_preference
+from helpers import apology, login_required, lookup, usd, checkIfDuplicates, order_by_preference, get_current_value
 
 # Configure application
 app = Flask(__name__)
@@ -48,11 +48,33 @@ def index():
     """ Homepage """
     # If currently no user, show login page.
     # Show stocks and cashremaining for user.
+    time = get_current_value()
+    print(f"{time}")
+    houses = db.execute(f"SELECT house FROM new_generic_day WHERE {time} >= start_time AND {time} <= end_time")
     if session.get("user_id") is None:
-        return render_template("test.html")
+        output = []
+        for row in houses:
+            if row["house"]=="freshman":
+                output.append("Annenberg")
+            else:
+                output.append(row["house"].capitalize())
+        if len(output) == 0:
+            output.append("None")
+        return render_template("test.html", houses = output)
     else:
         user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
-        return render_template("test.html", username=user[0]["username"], house=user[0]["house"].capitalize())
+        houses = db.execute(f"SELECT DISTINCT * FROM restrictions WHERE restriction_id IN (SELECT restriction_id FROM new_generic_day WHERE {time} > start_time AND {time} < end_time)")
+        output = []
+        for row in houses:
+            if row["open_to"]==user[0]["house"]:
+                if row["house_in_question"]=="freshman":
+                    output.append("Annenberg")
+                else:
+                    output.append(row["house_in_question"].capitalize())
+        output = order_by_preference(output)
+        if len(output) == 0:
+            output.append("None")
+        return render_template("test.html", username=user[0]["username"], house=user[0]["house"].capitalize(), houses=output)
 
 
 @app.route("/buy", methods=["GET", "POST"])

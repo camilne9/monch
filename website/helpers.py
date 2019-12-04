@@ -2,6 +2,7 @@ import os
 import requests
 import urllib.parse
 
+from datetime import datetime
 from cs50 import SQL
 from flask import redirect, render_template, request, session
 from functools import wraps
@@ -73,6 +74,8 @@ def checkIfDuplicates(listOfElems):
 
 def order_by_preference(list_of_strings):
     user_id = session["user_id"]
+    if len(list_of_strings) == 0:
+        return list_of_strings
     for house in list_of_strings:
         houses = db.execute(f"SELECT house FROM dhallpreferences WHERE user_id IS {user_id} ORDER BY rank")
     names = []
@@ -81,3 +84,10 @@ def order_by_preference(list_of_strings):
     if len(names) == 0:
         return list_of_strings
     return names
+
+def get_current_value():
+    now = datetime.now()
+    hour = now.hour
+    minute = now.minute
+    value = ((hour-5)%24)*60 + minute
+    return value
