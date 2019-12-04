@@ -7,7 +7,7 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, lookup, usd, checkIfDuplicates
+from helpers import apology, login_required, lookup, usd, checkIfDuplicates, order_by_preference
 
 # Configure application
 app = Flask(__name__)
@@ -125,7 +125,7 @@ def inputtime():
                     output.append("Annenberg")
                 else:
                     output.append(row["house_in_question"].capitalize())
-        return render_template("open.html", houses=output)
+        return render_template("open.html", houses=order_by_preference(output))
     else:
         return render_template("arbitrary_time.html", valid_hours = valid_hours, valid_minutes = valid_minutes)
 
@@ -221,6 +221,7 @@ def dhallranks():
     """Sell shares of stock"""
     user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
     if request.method == "POST":
+        db.execute("DELETE FROM dhallpreferences WHERE user_id=:userid",userid=user["id"])
         preferences = []
         for i in range(13):
             entry = request.form.get(f"pref{i+1}")

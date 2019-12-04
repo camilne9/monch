@@ -2,9 +2,11 @@ import os
 import requests
 import urllib.parse
 
+from cs50 import SQL
 from flask import redirect, render_template, request, session
 from functools import wraps
 
+db = SQL("sqlite:///monch.db")
 
 def apology(message, code=400):
     """Render message as an apology to user."""
@@ -68,3 +70,14 @@ def checkIfDuplicates(listOfElems):
         return False
     else:
         return True
+
+def order_by_preference(list_of_strings):
+    user_id = session["user_id"]
+    for house in list_of_strings:
+        houses = db.execute(f"SELECT house FROM dhallpreferences WHERE user_id IS {user_id} ORDER BY rank")
+    names = []
+    for house in houses:
+        names.append(house["house"])
+    if len(names) == 0:
+        return list_of_strings
+    return names
