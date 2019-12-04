@@ -105,6 +105,7 @@ def buy():
 def inputtime():
     valid_hours = list(range(1, 13))
     valid_minutes = list(range(0, 60))
+    user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
     if request.method == "POST":
         hour = int(request.form.get("Hour"))
         minute = int(request.form.get("Minute"))
@@ -125,9 +126,9 @@ def inputtime():
                     output.append("Annenberg")
                 else:
                     output.append(row["house_in_question"].capitalize())
-        return render_template("open.html", houses=order_by_preference(output))
+        return render_template("open.html", houses=order_by_preference(output), house=user[0]["house"].capitalize())
     else:
-        return render_template("arbitrary_time.html", valid_hours = valid_hours, valid_minutes = valid_minutes)
+        return render_template("arbitrary_time.html", valid_hours = valid_hours, valid_minutes = valid_minutes, house=user[0]["house"].capitalize())
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -221,7 +222,7 @@ def dhallranks():
     """Sell shares of stock"""
     user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
     if request.method == "POST":
-        db.execute("DELETE FROM dhallpreferences WHERE user_id=:userid",userid=user["id"])
+        db.execute("DELETE FROM dhallpreferences WHERE user_id=:userid",userid=user[0]["id"])
         preferences = []
         for i in range(13):
             entry = request.form.get(f"pref{i+1}")
@@ -236,7 +237,7 @@ def dhallranks():
             db.execute(f"INSERT INTO dhallpreferences (user_id,house,rank) VALUES(:userid,:house,:rank)",userid=user[0]["id"],house=preferences[int(j)],rank=int(j+1))
         return redirect("/")
     else:
-        return render_template("dhallranks.html", houses=houses, house=user[0]["house"])
+        return render_template("dhallranks.html", houses=houses, house=user[0]["house"].capitalize())
 
 
         #stock = request.form.get("corpcode")
@@ -275,6 +276,7 @@ def dhallranks():
 @app.route("/passwordchange", methods=["GET", "POST"])
 @login_required
 def passwordchange():
+    user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
     if request.method == "POST":
         # Catch invalid entries.
         if not request.form.get("oldpassword"):
@@ -292,7 +294,7 @@ def passwordchange():
                        passwordhash=generate_password_hash(request.form.get("newpassword")), userid=session["user_id"])
             return redirect("/")
     else:
-        return render_template("passwordchange.html")
+        return render_template("passwordchange.html", house=user[0]["house"].capitalize())
 
 
 def errorhandler(e):
