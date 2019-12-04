@@ -190,6 +190,8 @@ def createaccount():
                 passwordhash = generate_password_hash(password)
                 db.execute(f"INSERT INTO users (username,hash,house) VALUES(:username, :passwordhash, :house)",
                        username=name, passwordhash=passwordhash, house=house)
+                db.execute(f"INSERT INTO dhallpreferences (user_id,pref1,pref2,pref3,pref4,pref5,pref6,pref7,pref8,pref9,pref10,pref11,pref12,pref13) VALUES(:userid,:pref1,:pref2,:pref3,:pref4,:pref5,:pref6,:pref7,:pref8,:pref9,:pref10,:pref11,:pref12,:pref13)"
+                           userid=session["user_id"],pref1="First-Year",pref2="Lowell",pref3="Quincy",pref4="Leverett",pref5="Dunster",pref6="Eliot",pref7="Currier",pref8="Adams",pref9="Winthrop",pref10="Mather",pref11="Pforzheimer",pref12="Kirkland",pref13="Cabot")
             return redirect("/")
         else:
             return apology("must select house")
@@ -201,51 +203,48 @@ def createaccount():
 @login_required
 def dhallranks():
     """Sell shares of stock"""
+    user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
     if request.method == "POST":
         # Catch empty entries.
-        if not request.form.get("numofstocks"):
-            return apology("Must enter number of stocks", 403)
-        elif not request.form.get("corpcode"):
-            return apology("Must enter stock symbol", 403)
-        stock = request.form.get("corpcode")
-        numofstocks = request.form.get("numofstocks")
-        row = db.execute("SELECT * FROM stocks WHERE Stock=:stock AND user_id=:userid", stock=stock, userid=session["user_id"])
-        # Check to see if stocks are owned.
-        if len(row) == 0:
-            return apology("Can only sell stocks you own")
-        # Catch negative entries.
-        if int(numofstocks) <= 0:
-            return apology("Must sell positive number of stocks")
-        # Can only sell up to number of stocks owned.
-        num2 = row[0]["NumOfStocks"]
-        print(f"{num2}")
-        if int(numofstocks) > row[0]["NumOfStocks"]:
-            return apology("Attempt to sell more stocks than owned")
-        stockvalue = lookup(stock)
-        user = db.execute(f"SELECT * FROM users WHERE id = :userid", userid=session["user_id"])
-        cashremaining = user[0]["cash"] + (float(numofstocks) * stockvalue["price"])
-        stocks = db.execute(f"SELECT * FROM stocks WHERE user_id = :userid AND Stock=:stock",
-                            userid=session["user_id"], stock=stock)
-        # Update cash for user.
-        db.execute(f"UPDATE users SET cash = :cashremaining WHERE id = :userid", cashremaining=cashremaining, userid=user[0]["id"])
-        number = int(stocks[0]["NumOfStocks"])-int(numofstocks)
-        # Get rid of stock entry if no more stocks from that company owned.
-        if number == 0:
-            db.execute(f"DELETE FROM stocks WHERE user_id=:userid AND Stock=:stock", userid=user[0]["id"], stock=stock)
-        # Update stocks for user.
-        else:
-            db.execute(f"UPDATE stocks SET NumOfStocks = :number WHERE Stock = :stock AND user_id=:userid",
-                       number=number, stock=stock, userid=user[0]["id"])
-        db.execute(f"UPDATE stocks SET TotalValue = :value WHERE Stock = :stock AND user_id=:userid", value=(
-            (float(numofstocks)+float(stocks[0]["NumOfStocks"]))*stockvalue["price"]), stock=stock, userid=user[0]["id"])
-        db.execute(f"UPDATE stocks SET StockValue = :stockvalue WHERE Stock = :stock AND user_id=:userid",
-                   stockvalue=stockvalue["price"], stock=stock, userid=user[0]["id"])
-        db.execute(f"INSERT INTO history (user_id, boughtsold, Stock, NumOfStocks, StockValue, TotalValue, cashremaining) VALUES(:userid, 'sold', :stock, :numofstocks, :stockvalue, :totalvalue, :cashremaining)",
-                   userid=user[0]["id"], stock=stock, numofstocks=int(numofstocks), stockvalue=stockvalue["price"], totalvalue=(float(numofstocks)*stockvalue["price"]), cashremaining=cashremaining)
-        return redirect("/")
+        preferences = [request.form.get(f"pref{i+1}") for i in range(13)]
+        for row in preferences:
+            db.execute(f"UPDATE dhallpreferences SET(pref{i} = :preference) WHERE user_id=:userid", preference=)
     else:
-        return render_template("dhallranks.html", houses=houses)
+        return render_template("dhallranks.html", houses=houses, house=user[0]["house"])
 
+
+        #stock = request.form.get("corpcode")
+        #numofstocks = request.form.get("numofstocks")
+        #row = db.execute("SELECT * FROM stocks WHERE Stock=:stock AND user_id=:userid", stock=stock, userid=session["user_id"])
+        # Check to see if stocks are owned.
+        #if len(row) == 0:
+        #    return apology("Can only sell stocks you own")
+        # Catch negative entries.
+        #if int(numofstocks) <= 0:
+        #    return apology("Must sell positive number of stocks")
+        # Can only sell up to number of stocks owned.
+        #num2 = row[0]["NumOfStocks"]
+        #print(f"{num2}")
+        #if int(numofstocks) > row[0]["NumOfStocks"]:
+        #    return apology("Attempt to sell more stocks than owned")
+        #stockvalue = lookup(stock)
+        #user = db.execute(f"SELECT * FROM users WHERE id = :userid", userid=session["user_id"])
+        #cashremaining = user[0]["cash"] + (float(numofstocks) * stockvalue["price"])
+        #stocks = db.execute(f"SELECT * FROM stocks WHERE user_id = :userid AND Stock=:stock",
+        #                    userid=session["user_id"], stock=stock)
+        # Update cash for user.
+        #db.execute(f"UPDATE users SET cash = :cashremaining WHERE id = :userid", cashremaining=cashremaining, userid=user[0]["id"])
+        #number = int(stocks[0]["NumOfStocks"])-int(numofstocks)
+        # Get rid of stock entry if no more stocks from that company owned.
+        #if number == 0:
+        #    db.execute(f"DELETE FROM stocks WHERE user_id=:userid AND Stock=:stock", userid=user[0]["id"], stock=stock)
+        # Update stocks for user.
+        #else:
+        #    db.execute(f"UPDATE stocks SET NumOfStocks = :number WHERE Stock = :stock AND user_id=:userid",
+        #               number=number, stock=stock, userid=user[0]["id"])
+        #db.execute(f"INSERT INTO preferences (user_id, boughtsold, Stock, NumOfStocks, StockValue, TotalValue, cashremaining) VALUES(:userid, 'sold', :stock, :numofstocks, :stockvalue, :totalvalue, :cashremaining)",
+        #           userid=user[0]["id"], stock=stock, numofstocks=int(numofstocks), stockvalue=stockvalue["price"], totalvalue=(float(numofstocks)*stockvalue["price"]), cashremaining=cashremaining)
+        #return redirect("/")
 
 @app.route("/passwordchange", methods=["GET", "POST"])
 @login_required
