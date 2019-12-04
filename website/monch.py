@@ -47,3 +47,4 @@ def order_by_preference(list_of_strings):
     for house in list_of_strings:
         houses = db.execute(f"SELECT * FROM preferences WHERE user_id IS {user_id} ORDER BY rank")
     houses = houses["house"]
+    return houses
