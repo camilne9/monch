@@ -52,7 +52,7 @@ def index():
         return render_template("test.html")
     else:
         user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
-        return render_template("test.html", username=user[0]["username"], house=user[0]["house"])
+        return render_template("test.html", username=user[0]["username"], house=user[0]["house"].capitalize())
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -121,7 +121,10 @@ def inputtime():
         output = []
         for row in houses:
             if row["open_to"]==user_house:
-                output.append(row["house_in_question"])
+                if row["house_in_question"]=="freshman":
+                    output.append("Annenberg")
+                else:
+                    output.append(row["house_in_question"].capitalize())
         return render_template("open.html", houses=output)
     else:
         return render_template("arbitrary_time.html", valid_hours = valid_hours, valid_minutes = valid_minutes)
@@ -180,6 +183,8 @@ def createaccount():
     if request.method == "POST":
         # if we are potsing, we get the output of the lookup function and store it.
         house = request.form.get("house")
+        if house == "First-Year":
+            house = "Freshman"
         house = house.lower()
         if house:
             # if the lookup doesn't return none, we use the lookup output to generate values that will allow us to update the necessary data.
@@ -203,9 +208,7 @@ def createaccount():
                 db.execute(f"INSERT INTO users (username,hash,house) VALUES(:username, :passwordhash, :house)",
                        username=name, passwordhash=passwordhash, house=house)
                 user = db.execute(f"SELECT * FROM users WHERE username=:name", name=name)
-                db.execute(f"INSERT INTO dhallpreferences (user_id,pref1,pref2,pref3,pref4,pref5,pref6,pref7,pref8,pref9,pref10,pref11,pref12,pref13) VALUES(:userid,:pref1,:pref2,:pref3,:pref4,:pref5,:pref6,:pref7,:pref8,:pref9,:pref10,:pref11,:pref12,:pref13)",
-                           userid=user[0]["id"],pref1="First-Year",pref2="Lowell",pref3="Quincy",pref4="Leverett",pref5="Dunster",pref6="Eliot",pref7="Currier",pref8="Adams",pref9="Winthrop",pref10="Mather",pref11="Pforzheimer",pref12="Kirkland",pref13="Cabot")
-            return redirect("/")
+                return redirect("/")
         else:
             return apology("must select house")
     else:
@@ -218,17 +221,19 @@ def dhallranks():
     """Sell shares of stock"""
     user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
     if request.method == "POST":
-        preferences = [request.form.get(f"pref{i+1}") for i in range(13)]
+        preferences = []
         for i in range(13):
+            entry = request.form.get(f"pref{i+1}")
+            preferences.append(f"{entry}")
         # Catch empty entries.
-            for preference in preferences:
-                if not preference:
-                    return apology("Empty rank")
+        if len(preferences)!=13:
+            return apology("Empty rank")
         # Check for duplicates.
         if checkIfDuplicates(preferences):
             return apology("Cannot repeat Dining Halls")
-        for i in len(preferences):
-            db.execute(f"UPDATE dhallpreferences SET(pref{i} = :preference) WHERE user_id=:userid", preference=preferences[i], userid=user["id"])
+        for j in range(13):
+            db.execute(f"INSERT INTO dhallpreferences (user_id,house,rank) VALUES(:userid,:house,:rank)",userid=user[0]["id"],house=preferences[int(j)],rank=int(j+1))
+        return redirect("/")
     else:
         return render_template("dhallranks.html", houses=houses, house=user[0]["house"])
 
