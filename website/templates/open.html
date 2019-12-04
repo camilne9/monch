@@ -6,11 +6,11 @@
 
 {% block main %}
     <h1>
-    Here are the houses open to you!
+    Here are the houses open to you at that time!
     </h1>
         <h2>
             {% for house in houses %}
-            {{house}}<br>
+            <h3>{{house}}</h3><br>
             {% endfor %}
         </h2>
 

@@ -7,7 +7,7 @@
 {% block main %}
     {% if session.user_id %}
         <h1> Welcome {{ username }}!</h1>
-                <h3>The current time is {{time}}</h3>
+                <h3>It is {{day}}, {{time}}</h3>
             <h2>
                 The Following Dining Halls are currently open for you:<br>
                 {% for house in houses %}
@@ -16,13 +16,13 @@
             </h2>
     {% else %}
         <h1> Welcome to Mönch!</h1>
-                <h3>The current time is {{time}}</h3>
+                <h3>It is {{day}}, {{time}}</h3>
             <h2>
                 The Following Dining Halls are currently open:<br>
                 {% for house in houses %}
-                {{house}}<br>
+                <h3>{{house}}</h3><br>
                 {% endfor %}
-                Log in to see your restrictions.
+                <h2>Log in to see your restrictions.</h2>
             </h2>
     {% endif %}
 

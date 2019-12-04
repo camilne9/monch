@@ -7,7 +7,7 @@ from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, lookup, usd, checkIfDuplicates, order_by_preference, get_current_value, current_time
+from helpers import apology, login_required, lookup, usd, checkIfDuplicates, order_by_preference, get_current_value, current_time, current_day
 
 # Configure application
 app = Flask(__name__)
@@ -50,6 +50,7 @@ def index():
     # Show stocks and cashremaining for user.
     time = get_current_value()
     currenttime = current_time()
+    day_of_week = current_day()
     print(f"{time}")
     houses = db.execute(f"SELECT house FROM new_generic_day WHERE {time} >= start_time AND {time} <= end_time")
     if session.get("user_id") is None:
@@ -61,10 +62,10 @@ def index():
                 output.append(row["house"].capitalize())
         if len(output) == 0:
             output.append("None")
-        return render_template("test.html", houses = output, time = currenttime)
+        return render_template("test.html", houses = output, time = currenttime, day=day_of_week.capitalize())
     else:
         user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
-        houses = db.execute(f"SELECT DISTINCT * FROM restrictions WHERE restriction_id IN (SELECT restriction_id FROM new_generic_day WHERE {time} > start_time AND {time} < end_time)")
+        houses = db.execute(f"SELECT DISTINCT * FROM restrictions WHERE restriction_id IN (SELECT {day_of_week} FROM all_days WHERE {time} > start_time AND {time} < end_time)")
         output = []
         for row in houses:
             if row["open_to"]==user[0]["house"]:
@@ -77,7 +78,7 @@ def index():
         print(f"{output2}")
         if len(output) == 0:
             output.append("None")
-        return render_template("test.html", username=user[0]["username"], house=user[0]["house"].capitalize(), houses=output, time = currenttime)
+        return render_template("test.html", username=user[0]["username"], house=user[0]["house"].capitalize(), houses=output, time = currenttime, day=day_of_week.capitalize())
 
 
 @app.route("/inputtime", methods=["GET", "POST"])
@@ -114,6 +115,8 @@ def inputtime():
                     output.append("Annenberg")
                 else:
                     output.append(row["house_in_question"].capitalize())
+        if len(output)==0:
+            output = ["None"]
         return render_template("open.html", houses=order_by_preference(output), house=user[0]["house"].capitalize())
     else:
         return render_template("arbitrary_time.html", valid_days=valid_days, valid_hours = valid_hours, valid_minutes = valid_minutes, house=user[0]["house"].capitalize())

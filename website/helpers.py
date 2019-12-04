@@ -102,6 +102,17 @@ def current_time():
     hour = now.hour - 5
     if hour > 12:
         hour = hour - 12
+        pm = True
     if minute < 10:
-        return str(f"{hour}:0{minute}")
-    return str(f"{hour}:{minute}")
+        if pm:
+            return str(f"{hour}:0{minute} P.M.")
+        else:
+            return str(f"{hour}:0{minute} A.M.")
+    if pm:
+        return str(f"{hour}:{minute} P.M.")
+    else:
+        return str(f"{hour}:{minute} A.M.")
+
+def current_day():
+    day = datetime.today().strftime("%A").lower()
+    return day
