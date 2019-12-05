@@ -148,7 +148,18 @@ def current_time():
         # In the case where the minute is two digits we apply the same strategy without the extra 0.
 
 def current_day():
+    weekdays = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"]
+    # We create a list of the weekdays.
     day = datetime.today().strftime("%A").lower()
     # This stores the current day of the week as a string. We cast it to lowercase for consistency.
+    if get_current_value() >= 1140:
+        # Since the timestamp is for England, if it is after 7pm then the day will be wrong so we need to go back a day.
+        # (Otherwise day is all we want.)
+        index = weekdays.index(day)
+        # Here we find the index in the weekdays list that is is in england.
+        index2 = (index - 1) % 7
+        # Since England is ahead, we subtract 1 to get the actual index. We take mod 7 to avoid negatives when we go back to saturday.
+        day = weekdays[index2]
+        # We set day equal to the value in weekddays 1 day prior.
     return day
-    # We retrun the day of the week.s
+    # We retrun the day of the week.

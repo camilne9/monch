@@ -53,7 +53,7 @@ def index():
     currenttime = current_time()
     day_of_week = current_day()
     # Here we use our helper functions to get the current time, the current time value, and the current day of the week.
-    houses = db.execute(f"SELECT house FROM new_generic_day WHERE {time} >= start_time AND {time} <= end_time")
+    houses = db.execute(f"SELECT house FROM all_days WHERE {time} >= start_time AND {time} <= end_time")
     # here we generate a dictionary of the houses that are open at the current time by querying into our database.
     if session.get("user_id") is None:
         # in the case where there is no user, we have no restrictions or preferences to worry about, we need only worry about what dhalls are open.
@@ -72,6 +72,7 @@ def index():
             output.append("None")
             # if the length of output is 0, then none of the dhalls are open so we add the word None to the list so that the html output will
             # indicate to the user that none of the houses are open rather than just having an uninformative blank space.
+        output.sort(key = str.lower)
         return render_template("test.html", houses = output, time = currenttime, day=day_of_week.capitalize())
         # We render the desired html template to show the information we just collected. We pass the information to the rendering so that we can use
         # it in the html.
