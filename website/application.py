@@ -8,7 +8,7 @@ from werkzeug.exceptions import default_exceptions, HTTPException, InternalServe
 from werkzeug.security import check_password_hash, generate_password_hash
 # here we load all of the necessary packages for the code
 
-from helpers import apology, login_required, lookup, usd, checkIfDuplicates, order_by_preference, get_current_value, current_time, current_day
+from helpers import apology, login_required, checkIfDuplicates, order_by_preference, get_current_value, current_time, current_day
 # This allows us to all any of the helper functions from helpers.py
 
 # Configure application
