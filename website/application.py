@@ -26,9 +26,6 @@ def after_request(response):
     return response
 
 
-# Custom filter
-app.jinja_env.filters["usd"] = usd
-
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_FILE_DIR"] = mkdtemp()
 app.config["SESSION_PERMANENT"] = False
@@ -38,11 +35,8 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///monch.db")
 
-# Make sure API key is set
-#if not os.environ.get("API_KEY"):
-#    raise RuntimeError("API_KEY not set")
-
-houses = {"Adams","Cabot","Currier","Dunster","Eliot","Kirkland","Leverett","Lowell","Mather","Pforzheimer","Quincy","Winthrop","First-Year"}
+houses = {"Adams", "Cabot", "Currier", "Dunster", "Eliot", "Kirkland", "Leverett",
+          "Lowell", "Mather", "Pforzheimer", "Quincy", "Winthrop", "First-Year"}
 
 
 @app.route("/")
@@ -61,7 +55,7 @@ def index():
         # we are going to pull the values from the dictionary houses and store them in a list so first we initialize an empty list
         for row in houses:
             # we loop through all of the entries in houses.
-            if row["house"]=="freshman":
+            if row["house"] == "freshman":
                 output.append("Annenberg")
                 # since the freshman dhall is called "Annenberg", if the house is freshman, we append the list with the dhall name.
             else:
@@ -72,19 +66,20 @@ def index():
             output.append("None")
             # if the length of output is 0, then none of the dhalls are open so we add the word None to the list so that the html output will
             # indicate to the user that none of the houses are open rather than just having an uninformative blank space.
-        output.sort(key = str.lower)
-        return render_template("test.html", houses = output, time = currenttime, day=day_of_week.capitalize())
+        output.sort(key=str.lower)
+        return render_template("test.html", houses=output, time=currenttime, day=day_of_week.capitalize())
         # We render the desired html template to show the information we just collected. We pass the information to the rendering so that we can use
         # it in the html.
     else:
         # This else case handles the situation when there is a user, so we need to think about restrictions and preferences.
         user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
         # here we get the information about the user from the users SQL database.
-        houses = db.execute(f"SELECT DISTINCT * FROM restrictions WHERE restriction_id IN (SELECT {day_of_week} FROM all_days WHERE {time} > start_time AND {time} < end_time)")
+        houses = db.execute(
+            f"SELECT DISTINCT * FROM restrictions WHERE restriction_id IN (SELECT {day_of_week} FROM all_days WHERE {time} >= start_time AND {time} <= end_time)")
         output = []
         for row in houses:
-            if row["open_to"]==user[0]["house"]:
-                if row["house_in_question"]=="freshman":
+            if row["open_to"] == user[0]["house"]:
+                if row["house_in_question"] == "freshman":
                     output.append("Annenberg")
                 else:
                     output.append(row["house_in_question"].capitalize())
@@ -93,9 +88,10 @@ def index():
             output.append("None")
             # if the length of output is 0, then none of the dhalls are open so we add the word None to the list so that the html output will
             # indicate to the user that none of the houses are open rather than just having an uninformative blank space.
-        return render_template("test.html", username=user[0]["username"], house=user[0]["house"].capitalize(), houses=output, time = currenttime, day=day_of_week.capitalize())
+        return render_template("test.html", username=user[0]["username"], house=user[0]["house"].capitalize(), houses=output, time=currenttime, day=day_of_week.capitalize())
         # We render the desired html template to show the information we just collected. We pass the information to the rendering so that we can use
         # it in the html.
+
 
 @app.route("/inputtime", methods=["GET", "POST"])
 @login_required
@@ -104,7 +100,7 @@ def inputtime():
     # the hour can be any integer from 1 to 12 so we create a list of these values.
     valid_minutes = list(range(0, 60))
     # the minute can be any integer from 0 to 59 so we create a list of these values.
-    valid_days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"]
+    valid_days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
     # here we create a list of the possible days of the week.
     # We will pass these lists to the html we render to have these lists supply the possibilities in drop down menus.
     user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
@@ -138,22 +134,23 @@ def inputtime():
         # We query into users database to find out everything we know about the user.
         user_house = user[0]["house"]
         # From the output of the above query, we draw out the users house so we know the users restrictions.
-        houses = db.execute(f"SELECT DISTINCT * FROM restrictions WHERE restriction_id IN (SELECT {day_of_week} FROM all_days WHERE {value} > start_time AND {value} < end_time )")
+        houses = db.execute(
+            f"SELECT DISTINCT * FROM restrictions WHERE restriction_id IN (SELECT {day_of_week} FROM all_days WHERE {value} >= start_time AND {value} <= end_time )")
         # Here we first collect all of the restriction numbers from the all_days databases where the time is in the entry window and the column is named for the day
         # of the week. Then we collect all of the distinct rows from restrictions where the restriction_id is in that set of restriction ids.
         output = []
         # we initialize an empty list in which to store the open houses.
         for row in houses:
-            if row["open_to"]==user_house:
+            if row["open_to"] == user_house:
                 # if the row indicates that the house is open to the user's house, then we will add the house in that row to the list.
-                if row["house_in_question"]=="freshman":
+                if row["house_in_question"] == "freshman":
                     output.append("Annenberg")
                     # As explained previously, the naming scheme for freshman is unusual, so we handle this case separately in adding it to
                     # the list of open houses.
                 else:
                     output.append(row["house_in_question"].capitalize())
                     # if the house is not freshman, we add the capitalized house name to the list.
-        if len(output)==0:
+        if len(output) == 0:
             output = ["None"]
             # if the length of output is 0, then none of the dhalls are open so we add the word None to the list so that the html output will
             # indicate to the user that none of the houses are open rather than just having an uninformative blank space.
@@ -162,7 +159,7 @@ def inputtime():
         # it in the html.
     else:
         # This else case means the user is trying to open the page rather than try to submit it.
-        return render_template("arbitrary_time.html", valid_days=valid_days, valid_hours = valid_hours, valid_minutes = valid_minutes, house=user[0]["house"].capitalize())
+        return render_template("arbitrary_time.html", valid_days=valid_days, valid_hours=valid_hours, valid_minutes=valid_minutes, house=user[0]["house"].capitalize())
         # We render the html that will prompt the user for the inputs. We pass the html the necessary variables for the drop down menus for the inputs.
 
 
@@ -242,14 +239,14 @@ def createaccount():
                 # Hash password and insert user into table.
                 passwordhash = generate_password_hash(password)
                 db.execute(f"INSERT INTO users (username,hash,house) VALUES(:username, :passwordhash, :house)",
-                       username=name, passwordhash=passwordhash, house=house)
+                           username=name, passwordhash=passwordhash, house=house)
                 user = db.execute(f"SELECT * FROM users WHERE username=:name", name=name)
                 return redirect("/")
         else:
             return apology("must select house")
             # This else case means the user didn't select a house from the drop down menu so we return an apology explaining this.
     else:
-        return render_template("createaccount.html", houses = houses)
+        return render_template("createaccount.html", houses=houses)
         # This "else" case means the user is trying to
 
 
@@ -259,56 +256,29 @@ def dhallranks():
     """Sell shares of stock"""
     user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
     if request.method == "POST":
-        db.execute("DELETE FROM dhallpreferences WHERE user_id=:userid",userid=user[0]["id"])
+        # When we get preferences submitted we delete the old preferences first.
+        db.execute("DELETE FROM dhallpreferences WHERE user_id=:userid", userid=user[0]["id"])
+        # Below we store all the preferences in a python list.
         preferences = []
         for i in range(13):
             entry = request.form.get(f"pref{i+1}")
             preferences.append(f"{entry}")
         # Catch empty entries.
-        if len(preferences)!=13:
+        if len(preferences) != 13:
             return apology("Empty rank")
         # Check for duplicates.
         if checkIfDuplicates(preferences):
             return apology("Cannot repeat Dining Halls")
+        # We add the preferences to the SQL database.
         for j in range(13):
-            db.execute(f"INSERT INTO dhallpreferences (user_id,house,rank) VALUES(:userid,:house,:rank)",userid=user[0]["id"],house=preferences[int(j)],rank=int(j+1))
+            db.execute(f"INSERT INTO dhallpreferences (user_id,house,rank) VALUES(:userid,:house,:rank)",
+                       userid=user[0]["id"], house=preferences[int(j)], rank=int(j+1))
+        # Redirect to homepage.
         return redirect("/")
     else:
+        # If get method, we load the dhallranks page with the relevant variables.
         return render_template("dhallranks.html", houses=houses, house=user[0]["house"].capitalize())
 
-
-        #stock = request.form.get("corpcode")
-        #numofstocks = request.form.get("numofstocks")
-        #row = db.execute("SELECT * FROM stocks WHERE Stock=:stock AND user_id=:userid", stock=stock, userid=session["user_id"])
-        # Check to see if stocks are owned.
-        #if len(row) == 0:
-        #    return apology("Can only sell stocks you own")
-        # Catch negative entries.
-        #if int(numofstocks) <= 0:
-        #    return apology("Must sell positive number of stocks")
-        # Can only sell up to number of stocks owned.
-        #num2 = row[0]["NumOfStocks"]
-        #print(f"{num2}")
-        #if int(numofstocks) > row[0]["NumOfStocks"]:
-        #    return apology("Attempt to sell more stocks than owned")
-        #stockvalue = lookup(stock)
-        #user = db.execute(f"SELECT * FROM users WHERE id = :userid", userid=session["user_id"])
-        #cashremaining = user[0]["cash"] + (float(numofstocks) * stockvalue["price"])
-        #stocks = db.execute(f"SELECT * FROM stocks WHERE user_id = :userid AND Stock=:stock",
-        #                    userid=session["user_id"], stock=stock)
-        # Update cash for user.
-        #db.execute(f"UPDATE users SET cash = :cashremaining WHERE id = :userid", cashremaining=cashremaining, userid=user[0]["id"])
-        #number = int(stocks[0]["NumOfStocks"])-int(numofstocks)
-        # Get rid of stock entry if no more stocks from that company owned.
-        #if number == 0:
-        #    db.execute(f"DELETE FROM stocks WHERE user_id=:userid AND Stock=:stock", userid=user[0]["id"], stock=stock)
-        # Update stocks for user.
-        #else:
-        #    db.execute(f"UPDATE stocks SET NumOfStocks = :number WHERE Stock = :stock AND user_id=:userid",
-        #               number=number, stock=stock, userid=user[0]["id"])
-        #db.execute(f"INSERT INTO preferences (user_id, boughtsold, Stock, NumOfStocks, StockValue, TotalValue, cashremaining) VALUES(:userid, 'sold', :stock, :numofstocks, :stockvalue, :totalvalue, :cashremaining)",
-        #           userid=user[0]["id"], stock=stock, numofstocks=int(numofstocks), stockvalue=stockvalue["price"], totalvalue=(float(numofstocks)*stockvalue["price"]), cashremaining=cashremaining)
-        #return redirect("/")
 
 @app.route("/passwordchange", methods=["GET", "POST"])
 @login_required
