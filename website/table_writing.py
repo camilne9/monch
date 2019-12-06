@@ -3,6 +3,10 @@ from sys import exit
 from cs50 import SQL
 # First we load the necessary packages.
 
+# This page loads the SQL tables from the csv files. The large chunks that are commented out are the result of the
+# origonal verison of Monch in which we approximated the schedule to be the same eery day of the week. Th uncommmented sections
+# correspond to the final version. (For more information, see DESIGN.md.)
+
 db = SQL("sqlite:///monch.db")
 # This will allow us to load the information from the csv to the sql database.
 
@@ -34,7 +38,7 @@ restrictions = csv.DictReader(file)
 for other_row in restrictions:
     # we loop through all of the rows in the data
     db.execute("INSERT INTO restrictions (restriction_id, open_to, house_in_question) VALUES(?, ?, ?)",
-                   other_row["restriction_id"], other_row["open_to"], other_row["house_in_question"])
+               other_row["restriction_id"], other_row["open_to"], other_row["house_in_question"])
     # we put all of the information from the csv into the SQL table
 
 file.close()
@@ -64,7 +68,7 @@ data = csv.DictReader(file)
 for row in data:
     # we loop through all of the rows in the data
     db.execute("INSERT INTO all_days (start_time, end_time, house, monday, tuesday, wednesday, thursday, friday, saturday, sunday) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                   row["start_time"], row["end_time"], row["house"], row["monday"], row["tuesday"], row["wednesday"], row["thursday"], row["friday"], row["saturday"], row["sunday"])
+               row["start_time"], row["end_time"], row["house"], row["monday"], row["tuesday"], row["wednesday"], row["thursday"], row["friday"], row["saturday"], row["sunday"])
     # we put all of the information from the csv into the SQL table
 
 file.close()

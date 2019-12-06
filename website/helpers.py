@@ -9,6 +9,7 @@ from functools import wraps
 
 db = SQL("sqlite:///monch.db")
 
+
 def apology(message, code=400):
     """Render message as an apology to user."""
     def escape(s):
@@ -38,33 +39,6 @@ def login_required(f):
     return decorated_function
 
 
-def lookup(symbol):
-    """Look up quote for symbol."""
-
-    # Contact API
-    try:
-        api_key = os.environ.get("API_KEY")
-        response = requests.get(f"https://cloud-sse.iexapis.com/stable/stock/{urllib.parse.quote_plus(symbol)}/quote?token={api_key}")
-        response.raise_for_status()
-    except requests.RequestException:
-        return None
-
-    # Parse response
-    try:
-        quote = response.json()
-        return {
-            "name": quote["companyName"],
-            "price": float(quote["latestPrice"]),
-            "symbol": quote["symbol"]
-        }
-    except (KeyError, TypeError, ValueError):
-        return None
-
-
-def usd(value):
-    """Format value as USD."""
-    return f"${value:,.2f}"
-
 def checkIfDuplicates(listOfElems):
     ''' Check if given list contains any duplicates '''
     # This helper function checks in there are any dublicates in a list. set() removes any duplicates so if the lengths of the list
@@ -73,6 +47,7 @@ def checkIfDuplicates(listOfElems):
         return False
     else:
         return True
+
 
 def order_by_preference(list_of_strings):
     # This function takes a list of strings that we will order.
@@ -104,10 +79,11 @@ def order_by_preference(list_of_strings):
     if len(names) == 0:
         # If names is empty then the user must have put in no preferences (because we already verified that list_of_strings is not empty).
         # In this case we have no basis for ordering the houses, so we simply return the houses in alphabetical order.
-        list_of_strings.sort(key = str.lower)
+        list_of_strings.sort(key=str.lower)
         return list_of_strings
     return names
     # We return the ordered list of open houses.
+
 
 def get_current_value():
     now = datetime.now()
@@ -116,11 +92,12 @@ def get_current_value():
     minute = now.minute
     # Here we find the hour and minute of the current timestamp for the sake of converting this time to
     # a time "value" of the same form as the times values in our SQL database "all_days".
-    value = ((hour-5)%24)*60 + minute
+    value = ((hour-5) % 24)*60 + minute
     # The value is the number of minutes into the day we are, so mulitply hours by 60 and add the minutes. Also we subtract 5 from hours
     # because timestamp gives the time in England and we want the time in cambridge so we shift it 5 hours. Since we want to be able to handle
     # negative values from the -5, we take the difference mod 24.
     return value
+
 
 def current_time():
     now = datetime.now()
@@ -148,8 +125,9 @@ def current_time():
         return str(f"{hour}:{minute} A.M.")
         # In the case where the minute is two digits we apply the same strategy without the extra 0.
 
+
 def current_day():
-    weekdays = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"]
+    weekdays = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
     # We create a list of the weekdays.
     day = datetime.today().strftime("%A").lower()
     # This stores the current day of the week as a string. We cast it to lowercase for consistency.
