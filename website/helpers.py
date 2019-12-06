@@ -129,6 +129,7 @@ def current_time():
     # Here we get the current timestamp and we isolate the minute and the hour.
     # Since the timestamp is for England, we adjust it to Cambridge MA time by subracting 5 and we resolve the
     # potential for negative numbers by taking mod 24.
+    pm = False
     if hour > 12:
         hour = hour - 12
         pm = True
