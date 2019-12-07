@@ -11,6 +11,7 @@ db = SQL("sqlite:///monch.db")
 # This will allow us to load the information from the csv to the sql database.
 
 #db.execute("DELETE FROM generic_day")
+db.execute("DELETE FROM all_days")
 db.execute("DELETE FROM restrictions")
 #db.execute("DELETE FROM new_generic_day")
 

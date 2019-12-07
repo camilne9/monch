@@ -35,8 +35,8 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///monch.db")
 
-houses = {"Adams", "Cabot", "Currier", "Dunster", "Eliot", "Kirkland", "Leverett",
-          "Lowell", "Mather", "Pforzheimer", "Quincy", "Winthrop", "First-Year"}
+housesOG = ["Adams", "Cabot", "Currier", "Dunster", "Eliot", "Kirkland", "Leverett",
+          "Lowell", "Mather", "Pforzheimer", "Quincy", "Winthrop", "First-Year"]
 
 
 @app.route("/")
@@ -46,20 +46,20 @@ def index():
     time = get_current_value()
     currenttime = current_time()
     day_of_week = current_day()
-    # Here we use our helper functions to get the current time, the current time value, and the current day of the week.
-    houses = db.execute(f"SELECT house FROM all_days WHERE {time} >= start_time AND {time} <= end_time")
     # here we generate a dictionary of the houses that are open at the current time by querying into our database.
     if session.get("user_id") is None:
+        # Here we use our helper functions to get the current time, the current time value, and the current day of the week.
+        houses = db.execute(f"SELECT DISTINCT house_in_question FROM restrictions WHERE restriction_id IN (SELECT {day_of_week} FROM all_days WHERE {time} >= start_time AND {time} <= end_time)")
         # in the case where there is no user, we have no restrictions or preferences to worry about, we need only worry about what dhalls are open.
         output = []
         # we are going to pull the values from the dictionary houses and store them in a list so first we initialize an empty list
         for row in houses:
             # we loop through all of the entries in houses.
-            if row["house"] == "freshman":
+            if row["house_in_question"] == "freshman":
                 output.append("Annenberg")
                 # since the freshman dhall is called "Annenberg", if the house is freshman, we append the list with the dhall name.
             else:
-                output.append(row["house"].capitalize())
+                output.append(row["house_in_question"].capitalize())
                 # Since all the upperclassman dhalls can be references with the house name, we simply append the list with the house
                 # name, which we capitalize for better aesthetic.
         if len(output) == 0:
@@ -88,7 +88,7 @@ def index():
             output.append("None")
             # if the length of output is 0, then none of the dhalls are open so we add the word None to the list so that the html output will
             # indicate to the user that none of the houses are open rather than just having an uninformative blank space.
-        return render_template("test.html", username=user[0]["username"], house=user[0]["house"].capitalize(), houses=output, time=currenttime, day=day_of_week.capitalize())
+        return render_template("test.html", username=user[0]["username"], house=user[0]["house"].capitalize(), houses=output2, time=currenttime, day=day_of_week.capitalize())
         # We render the desired html template to show the information we just collected. We pass the information to the rendering so that we can use
         # it in the html.
 
@@ -254,10 +254,8 @@ def createaccount():
 @login_required
 def dhallranks():
     """Sell shares of stock"""
-    user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
     if request.method == "POST":
-        # When we get preferences submitted we delete the old preferences first.
-        db.execute("DELETE FROM dhallpreferences WHERE user_id=:userid", userid=user[0]["id"])
+        user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
         # Below we store all the preferences in a python list.
         preferences = []
         for i in range(13):
@@ -269,6 +267,8 @@ def dhallranks():
         # Check for duplicates.
         if checkIfDuplicates(preferences):
             return apology("Cannot repeat Dining Halls")
+        # When we get preferences submitted we delete the old preferences first.
+        db.execute("DELETE FROM dhallpreferences WHERE user_id=:userid", userid=user[0]["id"])
         # We add the preferences to the SQL database.
         for j in range(13):
             db.execute(f"INSERT INTO dhallpreferences (user_id,house,rank) VALUES(:userid,:house,:rank)",
@@ -277,7 +277,8 @@ def dhallranks():
         return redirect("/")
     else:
         # If get method, we load the dhallranks page with the relevant variables.
-        return render_template("dhallranks.html", houses=houses, house=user[0]["house"].capitalize())
+        user = db.execute("SELECT * FROM users WHERE id=:userid", userid=session["user_id"])
+        return render_template("dhallranks.html", houses=housesOG, house=user[0]["house"].capitalize())
 
 
 @app.route("/passwordchange", methods=["GET", "POST"])

@@ -44,7 +44,7 @@ start_time,end_time,house,monday,tuesday,wednesday,thursday,friday,saturday,sund
 450,600,mather,15,15,15,15,15,15,15
 690,720,mather,15,15,15,15,15,100,15
 720,855,mather,15,15,15,15,15,15,15
-1020,1170,mather,15,15,15,31,15,15,15
+1020,1155,mather,15,15,15,31,15,15,15
 450,600,pforzheimer,16,16,16,16,16,16,16
 690,720,pforzheimer,16,16,16,16,16,100,16
 720,855,pforzheimer,16,16,16,16,16,16,16
