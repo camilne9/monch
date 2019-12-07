@@ -36,7 +36,7 @@ Session(app)
 db = SQL("sqlite:///monch.db")
 
 housesOG = ["Adams", "Cabot", "Currier", "Dunster", "Eliot", "Kirkland", "Leverett",
-          "Lowell", "Mather", "Pforzheimer", "Quincy", "Winthrop", "First-Year"]
+            "Lowell", "Mather", "Pforzheimer", "Quincy", "Winthrop", "First-Year"]
 
 
 @app.route("/")
@@ -49,7 +49,8 @@ def index():
     # here we generate a dictionary of the houses that are open at the current time by querying into our database.
     if session.get("user_id") is None:
         # Here we use our helper functions to get the current time, the current time value, and the current day of the week.
-        houses = db.execute(f"SELECT DISTINCT house_in_question FROM restrictions WHERE restriction_id IN (SELECT {day_of_week} FROM all_days WHERE {time} >= start_time AND {time} <= end_time)")
+        houses = db.execute(
+            f"SELECT DISTINCT house_in_question FROM restrictions WHERE restriction_id IN (SELECT {day_of_week} FROM all_days WHERE {time} >= start_time AND {time} <= end_time)")
         # in the case where there is no user, we have no restrictions or preferences to worry about, we need only worry about what dhalls are open.
         output = []
         # we are going to pull the values from the dictionary houses and store them in a list so first we initialize an empty list
@@ -246,7 +247,7 @@ def createaccount():
             return apology("must select house")
             # This else case means the user didn't select a house from the drop down menu so we return an apology explaining this.
     else:
-        return render_template("createaccount.html", houses=houses)
+        return render_template("createaccount.html", houses=housesOG)
         # This "else" case means the user is trying to
 
 

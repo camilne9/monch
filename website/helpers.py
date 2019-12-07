@@ -92,7 +92,7 @@ def get_current_value():
     minute = now.minute
     # Here we find the hour and minute of the current timestamp for the sake of converting this time to
     # a time "value" of the same form as the times values in our SQL database "all_days".
-    value = ((hour-7) % 24)*60 + minute
+    value = ((hour-5) % 24)*60 + minute
     # The value is the number of minutes into the day we are, so mulitply hours by 60 and add the minutes. Also we subtract 5 from hours
     # because timestamp gives the time in England and we want the time in cambridge so we shift it 5 hours. Since we want to be able to handle
     # negative values from the -5, we take the difference mod 24.
@@ -102,7 +102,7 @@ def get_current_value():
 def current_time():
     now = datetime.now()
     minute = now.minute
-    hour = (now.hour - 7) % 24
+    hour = (now.hour - 5) % 24
     # Here we get the current timestamp and we isolate the minute and the hour.
     # Since the timestamp is for England, we adjust it to Cambridge MA time by subracting 5 and we resolve the
     # potential for negative numbers by taking mod 24.
