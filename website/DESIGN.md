@@ -1,6 +1,6 @@
-Monch Design
+Mönch Design
 
-	The concept for Monch comes from the complexities of the dining hall restrictions in the various houses. Depending on the meal and the day of
+	The concept for Mönch comes from the complexities of the dining hall restrictions in the various houses. Depending on the meal and the day of
 the week, each house as a different policy on which house people must be a part of in order to eat in that dining hall. With differing hours and
 inconsistent time windows where restrictions exist, we decided it would be handy to have a website that parces through the information for you, and
 outputs a list of the dining halls that are open to you. This was the premise of Monch and is indeed also the function of the website now that it is
@@ -10,7 +10,7 @@ the actual files would live, which is what we submitted. In this directory, we h
 with all of the html files and templates, and a collection of all of the csv files needed for the databases as well as 3 python files. The program
 application.py contains the bulk of the code for the site, helpers.py contains functions that we call repeatedly in applications.py to simplify the
 code, and table_writing.py contains the code that transferred all of the dhall data from our csv files to our SQL database.
-	The largest and most important hurdle for Monch was storing all of the information about the dining hall hours and restrictions. We decided we
+	The largest and most important hurdle for Mönch was storing all of the information about the dining hall hours and restrictions. We decided we
 would store the information in an SQL database for ease of isolating information that is of interest. However, designing the layout of the SQL
 tables was difficult. Ultimately the Monch website required 4 different SQL tables: 2 with the information about the dining hall hours and restrictions
 and 2 dealing with the user information including user dhall preferences.
@@ -27,9 +27,9 @@ these restriction_id’s requires using the “restrictions” table in tandem w
     The 2 SQL tables that handle user information were more straightforward. The “users” table stores the username, user_id, the user’s house, and
 hashed password of anyone that creates an account. The “dhallpreferences” table has a row with a user_id, house, and a rank number. When you submit your
 preferences, 13 rows are added to the table, one for each of your ranks.
-In the SQL that we submitted there are also tables called “generic_day” and “new_generic_day”. These tables are from our first attempt at Monch. Because
+In the SQL that we submitted there are also tables called “generic_day” and “new_generic_day”. These tables are from our first attempt at Mönch. Because
 of the difficulty of having all 7 different days restrictions, we first created the infrastructure for one “normal” day. Although we no longer use those
-tables because we were able to fully implement a version of Monch that can handle any day of the week (a Better outcome rather than a Good), we left it
+tables because we were able to fully implement a version of Mönch that can handle any day of the week (a Better outcome rather than a Good), we left it
 in the submitted folder for your reference.
 	Although the SQL work was the biggest design choice of the project, we also handled other design challenges such as working with a time variables.
 Since it is easier to work with numbers than time-like variables, we decided that we would express time as the number of minutes from the start of the
@@ -39,7 +39,7 @@ made the logic of our SQL queries much simpler (because it relied only on the al
 with time this way, we made helper functions that give you the “value” (as we define it) of the current time or that give you the current day of the
 week. We were also able to manipulate user inputs to also obtain a time “value” in cases where the user input a time.
 	A subtlety of our design that was particularly valuable for our goals can be observed in the “order_by_preference” helper function. Since the goal
-of Monch was to simplify the experience of discovering what dhalls were open, it was important to us that the outputs were in a logical order. For this
+of Mönch was to simplify the experience of discovering what dhalls were open, it was important to us that the outputs were in a logical order. For this
 reason, a main feature of the site is the ability to indicate your personal preferences for the various dhalls. Thus, when you are shown a list of the
 dining halls open to you, you always see them in order of favorite to least favorite. The re-ordering helper function gave us the ability to re-order any
 list by preference just by using the power of the SQL databases we had already created. Furthermore, the function also deals with the case when there
