@@ -108,13 +108,13 @@ def inputtime():
     if request.method == "POST":
         # here we are looking at the case where the form is being submitted, ie the user has input a day they are interested in.
         if request.form.get("Hour") == None:
-            return apology("Not a valid time")
+            return apology("Not a valid time", user[0]["house"].capitalize(), 403)
         if request.form.get("Minute") == None:
-            return apology("Not a valid time")
+            return apology("Not a valid time", user[0]["house"].capitalize(), 403)
         if request.form.get("Meridia") == None:
-            return apology("Not a valid time")
+            return apology("Not a valid time", user[0]["house"].capitalize(), 403)
         if request.form.get("Day") == None:
-            return apology("Not a valid day")
+            return apology("Not a valid day", user[0]["house"].capitalize(), 403)
         # The above "if" statements verify that the user filled out all of the fields necessary to indicate a particular time and day.
         # In the event that the user left one of the fields blank, we supply an apology indicating the mistake made.
         hour = int(request.form.get("Hour"))
@@ -216,6 +216,8 @@ def logout():
 def createaccount():
     if request.method == "POST":
         # if we are potsing, we get the output of the lookup function and store it.
+        if request.form.get("house") is None:
+            return apology("must select house", 403)
         house = request.form.get("house")
         if house == "First-Year":
             house = "Freshman"
@@ -264,10 +266,10 @@ def dhallranks():
             preferences.append(f"{entry}")
         # Catch empty entries.
         if len(preferences) != 13:
-            return apology("Empty rank")
+            return apology("Empty rank", user[0]["house"].capitalize(), 403)
         # Check for duplicates.
         if checkIfDuplicates(preferences):
-            return apology("Cannot repeat Dining Halls")
+            return apology("Cannot repeat Dining Halls", user[0]["house"].capitalize(), 403)
         # When we get preferences submitted we delete the old preferences first.
         db.execute("DELETE FROM dhallpreferences WHERE user_id=:userid", userid=user[0]["id"])
         # We add the preferences to the SQL database.
@@ -289,14 +291,14 @@ def passwordchange():
     if request.method == "POST":
         # Catch invalid entries.
         if not request.form.get("oldpassword"):
-            return apology("Must enter old password", 403)
+            return apology("Must enter old password", user[0]["house"].capitalize(), 403)
         if not request.form.get("newpassword"):
-            return apology("Must enter new password", 403)
+            return apology("Must enter new password", user[0]["house"].capitalize(), 403)
         user = db.execute("SELECT * FROM users WHERE id = :userid", userid=session["user_id"])
         if not check_password_hash(user[0]["hash"], request.form.get("oldpassword")):
-            return apology("Incorrect old password")
+            return apology("Incorrect old password", user[0]["house"].capitalize(), 403)
         if check_password_hash(user[0]["hash"], request.form.get("newpassword")):
-            return apology("New password can't be old password")
+            return apology("New password can't be old password", user[0]["house"].capitalize(), 403)
         # Alter password hash in table.
         else:
             db.execute("UPDATE users SET hash = :passwordhash WHERE id = :userid",

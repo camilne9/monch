@@ -10,7 +10,7 @@ from functools import wraps
 db = SQL("sqlite:///monch.db")
 
 
-def apology(message, code=400):
+def apology(message, userhouse, code=400):
     """Render message as an apology to user."""
     def escape(s):
         """
@@ -22,7 +22,10 @@ def apology(message, code=400):
                          ("%", "~p"), ("#", "~h"), ("/", "~s"), ("\"", "''")]:
             s = s.replace(old, new)
         return s
-    return render_template("apology.html", top=code, bottom=escape(message)), code
+    if userhouse is None:
+        return render_template("apology.html", top=code, bottom=escape(message)), code
+    else:
+        return render_template("apology.html", top=code, bottom=escape(message), house=userhouse), code
 
 
 def login_required(f):
