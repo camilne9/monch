@@ -3,16 +3,16 @@ Mönch Design
 	The concept for Mönch comes from the complexities of the dining hall restrictions in the various houses. Depending on the meal and the day of
 the week, each house as a different policy on which house people must be a part of in order to eat in that dining hall. With differing hours and
 inconsistent time windows where restrictions exist, we decided it would be handy to have a website that parces through the information for you, and
-outputs a list of the dining halls that are open to you. This was the premise of Monch and is indeed also the function of the website now that it is
+outputs a list of the dining halls that are open to you. This was the premise of Mönch and is indeed also the function of the website now that it is
 created.
 	In terms of the workflow, we created a shared GitHub repository. Inside the repository, we created a directory called “website” in which all of
-the actual files would live, which is what we submitted. In this directory, we have a directory with the CSS file and the “Monch” logo, a directory
+the actual files would live, which is what we submitted. In this directory, we have a directory with the CSS file and the “Mönch” logo, a directory
 with all of the html files and templates, and a collection of all of the csv files needed for the databases as well as 3 python files. The program
 application.py contains the bulk of the code for the site, helpers.py contains functions that we call repeatedly in applications.py to simplify the
 code, and table_writing.py contains the code that transferred all of the dhall data from our csv files to our SQL database.
 	The largest and most important hurdle for Mönch was storing all of the information about the dining hall hours and restrictions. We decided we
 would store the information in an SQL database for ease of isolating information that is of interest. However, designing the layout of the SQL
-tables was difficult. Ultimately the Monch website required 4 different SQL tables: 2 with the information about the dining hall hours and restrictions
+tables was difficult. Ultimately the Mönch website required 4 different SQL tables: 2 with the information about the dining hall hours and restrictions
 and 2 dealing with the user information including user dhall preferences.
     In terms of structure, we first had an SQL table “restrictions” containing rows that have a “restriction_id” (which is a variable that we created
 to represent each of the different restriction cases), a “house_in_question” variable that indicates what dhall you’re checking, and an “open_to”
@@ -52,4 +52,4 @@ than returning the open houses in a random order.
 information will be stored in our SQL database. However, if they resubmit dhall preferences, we first delete their old preferences before writing the
 new ones to the SQL database. Thus, the user is free to change their mind as many times as they want and we will always use their most recent
 preferences.
-	We had a lot of fun making Monch and we hope you enjoy it!
+	We had a lot of fun making Mönch and we hope you enjoy it!
