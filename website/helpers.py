@@ -115,6 +115,8 @@ def current_time():
         pm = True
         # Since the time is "military time", pm times have hours greater than 12. To match normal time conventions, we subtract 12 to
         # get the normal pm hour and indicate that it is pm.
+    if hour == 12:
+        pm = True
     if minute < 10:
         # To deal with the missing 0 of single digit minutes, we handle this case separately.
         if pm:
